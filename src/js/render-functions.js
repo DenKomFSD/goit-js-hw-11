@@ -1,16 +1,4 @@
 export function renderGalleryImages(images) {
-  if (!images || images.length === 0) {
-    iziToast.error({
-      title: 'Error',
-      message: `Sorry, there are no images matching your search query. Please try again!`,
-      backgroundColor: '#EF4040',
-      messageColor: '#fff',
-      titleColor: '#fff',
-      progressBarColor: '#B51B1B',
-      position: 'topRight',
-    });
-    return '';
-  }
   return images
     .map(
       ({

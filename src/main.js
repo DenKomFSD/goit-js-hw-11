@@ -35,6 +35,20 @@ function imageFetch(event) {
 
   getImages(inputValue)
     .then(response => {
+      if (!response.hits || response.hits.length === 0) {
+        // Перевірка наявності зображень тут
+        iziToast.error({
+          title: 'Error',
+          message: `Sorry, there are no images matching your search query. Please try again!`,
+          backgroundColor: '#EF4040',
+          messageColor: '#fff',
+          titleColor: '#fff',
+          progressBarColor: '#B51B1B',
+          position: 'topRight',
+        });
+        return;
+      }
+
       const html = renderGalleryImages(response.hits);
       gallery.innerHTML = html;
       lightbox.refresh();
