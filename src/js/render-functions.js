@@ -1,4 +1,19 @@
-export function renderGalleryImages(images) {
+import iziToast from 'izitoast';
+import 'izitoast/dist/css/iziToast.min.css';
+
+export function renderGalleryImages(images, hasImages) {
+  if (!hasImages) {
+    iziToast.error({
+      title: 'Error',
+      message: `Sorry, there are no images matching your search query. Please try again!`,
+      backgroundColor: '#EF4040',
+      messageColor: '#fff',
+      titleColor: '#fff',
+      progressBarColor: '#B51B1B',
+      position: 'topRight',
+    });
+    return;
+  }
   return images
     .map(
       ({
