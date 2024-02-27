@@ -1,7 +1,33 @@
 import iziToast from 'izitoast';
 import 'izitoast/dist/css/iziToast.min.css';
+import SimpleLightbox from 'simplelightbox';
+import 'simplelightbox/dist/simple-lightbox.min.css';
 
-export function renderGalleryImages(images, hasImages) {
+export function renderGalleryImages(images) {
+  const gallery = document.querySelector('.gallery');
+  const form = document.querySelector('.search-form');
+  const loader = document.querySelector('.loader');
+
+  const lightbox = new SimpleLightbox('.gallery-item a', {
+    captionsData: 'alt',
+    captionDelay: 250,
+    captionPosition: 'bottom',
+  });
+  if (!images || images.length === 0) {
+    iziToast.error({
+      title: 'Error',
+      message: `Sorry, there are no images matching your search query. Please try again!`,
+      backgroundColor: '#EF4040',
+      messageColor: '#fff',
+      titleColor: '#fff',
+      progressBarColor: '#B51B1B',
+      position: 'topRight',
+    });
+    loader.classList.add('is-hidden');
+    return;
+  }
+
+  const hasImages = images && images.length > 0;
   if (!hasImages) {
     iziToast.error({
       title: 'Error',
@@ -14,7 +40,7 @@ export function renderGalleryImages(images, hasImages) {
     });
     return;
   }
-  return images
+  const html = images
     .map(
       ({
         webformatURL,
@@ -54,4 +80,8 @@ export function renderGalleryImages(images, hasImages) {
       </li>`
     )
     .join('');
+
+  gallery.innerHTML = html;
+  lightbox.refresh();
+  loader.classList.add('is-hidden');
 }
