@@ -33,55 +33,35 @@ function imageFetch(event) {
 
   getImages(inputValue)
     .then(response => {
+      if (response.hits.length === 0) {
+        throw new Error('No images found');
+      }
       renderGalleryImages(response.hits);
       event.target.reset();
     })
     .catch(error => {
       iziToast.error({
         title: 'Error',
-        message: `${error}`,
+        message: `${error.message || 'Something went wrong'}`,
+        backgroundColor: '#EF4040',
+        messageColor: '#fff',
+        titleColor: '#fff',
+        progressBarColor: '#B51B1B',
+        position: 'topRight',
       });
     })
     .finally(() => {
       loader.classList.add('is-hidden');
     });
 }
-//render gallery
-function renderGalleryImages(images) {
-  //use simpplelightbox
-  const lightbox = new SimpleLightbox('.gallery-item a', {
-    captionsData: 'alt',
-    captionDelay: 250,
-    captionPosition: 'bottom',
-  });
-  //if no images
-  if (!images || images.length === 0) {
-    iziToast.error({
-      title: 'Error',
-      message: `Sorry, there are no images matching your search query. Please try again!`,
-      backgroundColor: '#EF4040',
-      messageColor: '#fff',
-      titleColor: '#fff',
-      progressBarColor: '#B51B1B',
-      position: 'topRight',
-    });
-    loader.classList.add('is-hidden');
-    return;
-  }
 
-  const hasImages = images && images.length > 0;
-  if (!hasImages) {
-    iziToast.error({
-      title: 'Error',
-      message: `Sorry, there are no images matching your search query. Please try again!`,
-      backgroundColor: '#EF4040',
-      messageColor: '#fff',
-      titleColor: '#fff',
-      progressBarColor: '#B51B1B',
-      position: 'topRight',
-    });
-    return;
-  }
+const lightbox = new SimpleLightbox('.gallery-item a', {
+  captionsData: 'alt',
+  captionDelay: 250,
+  captionPosition: 'bottom',
+});
+
+function renderGalleryImages(images) {
   const html = images
     .map(
       ({
@@ -94,36 +74,35 @@ function renderGalleryImages(images) {
         downloads,
       }) =>
         `<li class ='gallery-item'>
-            <a class="gallery-link" href="${largeImageURL}">
-                <img class="gallery-image"
-                  src="${webformatURL}"
-                  alt="${tags}"
-                  width="360"
-                  height="152"/>
-            </a>  
-            <div class='info-block'>
-                <div class="info">
-                    <h3 class = "head-likes">Likes</h3>
-                    <p>${likes}</p>
-                </div>
-                <div class="info">
-                    <h3 class = "head-views">Views</h3>
-                    <p>${views}</p>
-                </div>
-                <div class="info">
-                    <h3 class = "head-comments">Comments</h3>
-                    <p>${comments}</p>
-                </div>
-                            <div class="info">
-                    <h3 class = "head-downloads">Downloads</h3>
-                    <p>${downloads}</p>
-                </div>
+        <a class="gallery-link" href="${largeImageURL}">
+            <img class="gallery-image"
+                src="${webformatURL}"
+                alt="${tags}"
+                width="360"
+                height="152"/>
+        </a>  
+        <div class='info-block'>
+            <div class="info">
+                <h3 class = "head-likes">Likes</h3>
+                <p>${likes}</p>
             </div>
-      </li>`
+            <div class="info">
+                <h3 class = "head-views">Views</h3>
+                <p>${views}</p>
+            </div>
+            <div class="info">
+                <h3 class = "head-comments">Comments</h3>
+                <p>${comments}</p>
+            </div>
+            <div class="info">
+                <h3 class = "head-downloads">Downloads</h3>
+                <p>${downloads}</p>
+            </div>
+        </div>
+    </li>`
     )
     .join('');
 
   gallery.innerHTML = html;
   lightbox.refresh();
-  loader.classList.add('is-hidden');
 }
