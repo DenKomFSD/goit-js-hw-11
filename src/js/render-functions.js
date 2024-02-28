@@ -2,17 +2,59 @@ import iziToast from 'izitoast';
 import 'izitoast/dist/css/iziToast.min.css';
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
+import { getImages } from './pixabay-api';
 
-export function renderGalleryImages(images) {
-  const gallery = document.querySelector('.gallery');
-  const form = document.querySelector('.search-form');
-  const loader = document.querySelector('.loader');
+const gallery = document.querySelector('.gallery');
+const form = document.querySelector('.search-form');
+const loader = document.querySelector('.loader');
 
+form.addEventListener('submit', imageFetch);
+
+function imageFetch(event) {
+  event.preventDefault();
+  gallery.innerHTML = '';
+  loader.classList.remove('is-hidden');
+  const inputValue = event.currentTarget.elements.search.value.trim();
+
+  if (inputValue === '') {
+    iziToast.error({
+      title: 'Error',
+      message: `Please enter a search query.`,
+      backgroundColor: '#EF4040',
+      messageColor: '#fff',
+      titleColor: '#fff',
+      progressBarColor: '#B51B1B',
+      position: 'topRight',
+    });
+    loader.classList.add('is-hidden');
+    return;
+  }
+  loader.classList.remove('is-hidden');
+
+  getImages(inputValue)
+    .then(response => {
+      renderGalleryImages(response.hits);
+      event.target.reset();
+    })
+    .catch(error => {
+      iziToast.error({
+        title: 'Error',
+        message: `${error}`,
+      });
+    })
+    .finally(() => {
+      loader.classList.add('is-hidden');
+    });
+}
+//render gallery
+function renderGalleryImages(images) {
+  //use simpplelightbox
   const lightbox = new SimpleLightbox('.gallery-item a', {
     captionsData: 'alt',
     captionDelay: 250,
     captionPosition: 'bottom',
   });
+  //if no images
   if (!images || images.length === 0) {
     iziToast.error({
       title: 'Error',
